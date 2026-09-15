@@ -12,6 +12,7 @@ import type {
   CreateWorkingSetItemResult,
   MemoryItemSnapshot,
   MemoryLayerId,
+  PromoteWorkingSetItemResult,
   ProjectInitializationResult,
   ProjectSnapshot,
 } from "../shared/project";
@@ -124,6 +125,39 @@ export class ProjectSession {
 
     return {
       item: toMemoryItemSnapshot(item),
+      snapshot: await this.getSnapshot(),
+    };
+  }
+
+  async promoteWorkingSetItem(itemId: unknown): Promise<PromoteWorkingSetItemResult> {
+    if (typeof itemId !== "string" || itemId.trim().length === 0) {
+      throw new Error("Knowledge Item ID must be non-empty text.");
+    }
+
+    const memoryStore = await this.getOrOpenMemoryStore();
+    const repository = new MemoryRepository(memoryStore);
+    const item = repository.getById(itemId.trim());
+
+    if (!item) {
+      throw new Error("Knowledge Item was not found.");
+    }
+
+    if (item.layer !== "working_set") {
+      throw new Error("Only Working Set items can be promoted.");
+    }
+
+    const promotedItem = repository.moveToLayer({
+      id: item.id,
+      layer: "active_memory",
+      timestamp: new Date(),
+    });
+
+    if (!promotedItem) {
+      throw new Error("Knowledge Item was not found.");
+    }
+
+    return {
+      item: toMemoryItemSnapshot(promotedItem),
       snapshot: await this.getSnapshot(),
     };
   }

@@ -4,6 +4,7 @@ import { join } from "node:path";
 import {
   MEMORY_CREATE_WORKING_SET_CHANNEL,
   MEMORY_ITEMS_CHANNEL,
+  MEMORY_PROMOTE_WORKING_SET_CHANNEL,
   PROJECT_INITIALIZE_CHANNEL,
   PROJECT_SELECT_CHANNEL,
   PROJECT_SNAPSHOT_CHANNEL,
@@ -37,6 +38,9 @@ function registerProjectHandlers(): void {
   ipcMain.handle(MEMORY_ITEMS_CHANNEL, (_event, layer) => projectSession.listMemoryItems(layer));
   ipcMain.handle(MEMORY_CREATE_WORKING_SET_CHANNEL, (_event, content) =>
     projectSession.createWorkingSetItem(content),
+  );
+  ipcMain.handle(MEMORY_PROMOTE_WORKING_SET_CHANNEL, (_event, itemId) =>
+    projectSession.promoteWorkingSetItem(itemId),
   );
 }
 

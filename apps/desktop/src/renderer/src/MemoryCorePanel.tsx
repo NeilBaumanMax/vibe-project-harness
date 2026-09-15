@@ -39,6 +39,8 @@ export function MemoryCorePanel({
   const [draftContent, setDraftContent] = useState("");
   const [captureState, setCaptureState] = useState<"idle" | "saving">("idle");
   const [captureMessage, setCaptureMessage] = useState<string>();
+  const [promotingItemId, setPromotingItemId] = useState<string>();
+  const [promotionMessage, setPromotionMessage] = useState<string>();
   const [refreshVersion, setRefreshVersion] = useState(0);
 
   useEffect(() => {
@@ -83,6 +85,24 @@ export function MemoryCorePanel({
       setCaptureMessage(error instanceof Error ? error.message : "Knowledge Item could not be saved.");
     } finally {
       setCaptureState("idle");
+    }
+  }
+
+  async function promoteWorkingSetItem(itemId: string): Promise<void> {
+    setPromotingItemId(itemId);
+    setPromotionMessage(undefined);
+
+    try {
+      const result = await window.harness.promoteWorkingSetItem(itemId);
+      setPromotionMessage("Promoted to Active Memory.");
+      onProjectSnapshotChange(result.snapshot);
+      setRefreshVersion((version) => version + 1);
+    } catch (error) {
+      setPromotionMessage(
+        error instanceof Error ? error.message : "Knowledge Item could not be promoted.",
+      );
+    } finally {
+      setPromotingItemId(undefined);
     }
   }
 
@@ -136,8 +156,18 @@ export function MemoryCorePanel({
                 {captureState === "saving" ? "Capturing…" : "Capture"}
               </button>
             </div>
-            {captureMessage && <p className="capture-message">{captureMessage}</p>}
+            {captureMessage && (
+              <p className="capture-message" role="status">
+                {captureMessage}
+              </p>
+            )}
           </form>
+
+          {promotionMessage && (
+            <p className="memory-action-message" role="status">
+              {promotionMessage}
+            </p>
+          )}
 
           <div className="layer-filters" aria-label="Memory layer filter">
             <button
@@ -181,7 +211,20 @@ export function MemoryCorePanel({
                     </time>
                   </div>
                   <p>{item.content}</p>
-                  <code>{item.id}</code>
+                  <div className="memory-item__footer">
+                    <code>{item.id}</code>
+                    {item.layer === "working_set" && (
+                      <button
+                        className="control-button control-button--secondary"
+                        data-testid={`promote-${item.id}`}
+                        disabled={promotingItemId !== undefined}
+                        onClick={() => void promoteWorkingSetItem(item.id)}
+                        type="button"
+                      >
+                        {promotingItemId === item.id ? "Promoting…" : "Promote to Active"}
+                      </button>
+                    )}
+                  </div>
                 </article>
               ))}
             </div>

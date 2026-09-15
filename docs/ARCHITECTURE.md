@@ -19,6 +19,9 @@ timestamp strings; database and repository objects remain in the main process.
 The first desktop mutation command accepts Working Set text only. The main process
 validates and trims the content, generates its UUID and timestamp, and fixes the
 destination layer before writing through the Memory repository.
+Manual promotion follows the same boundary: the renderer sends an item ID, while
+the main process verifies that the current layer is Working Set and moves it only
+to Active Memory with a main-process timestamp.
 
 The application contains:
 

@@ -39,6 +39,8 @@ its schema version and current knowledge-item total.
 The Memory Core panel lists and filters all five memory layers. Human operators can
 manually capture text into the active project's Working Set; item identity,
 timestamp and destination layer are controlled by the main process.
+Working Set items can be explicitly promoted to Active Memory from their item card.
+The main process validates the source layer and fixes the destination.
 
 Validation commands:
 
