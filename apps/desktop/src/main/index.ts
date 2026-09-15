@@ -2,6 +2,7 @@ import { app, BrowserWindow, dialog, ipcMain } from "electron";
 import { join } from "node:path";
 
 import {
+  MEMORY_ITEMS_CHANNEL,
   PROJECT_INITIALIZE_CHANNEL,
   PROJECT_SELECT_CHANNEL,
   PROJECT_SNAPSHOT_CHANNEL,
@@ -32,6 +33,7 @@ function registerProjectHandlers(): void {
     };
   });
   ipcMain.handle(PROJECT_INITIALIZE_CHANNEL, () => projectSession.initialize());
+  ipcMain.handle(MEMORY_ITEMS_CHANNEL, (_event, layer) => projectSession.listMemoryItems(layer));
 }
 
 function createWindow(): void {

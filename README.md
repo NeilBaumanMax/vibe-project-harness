@@ -36,6 +36,8 @@ project has no `.vibe` directory, initialization creates only
 `.vibe/manifest.json`; it does not initialize the Memory Engine.
 For initialized projects, Mission Control opens the local memory runtime and reports
 its schema version and current knowledge-item total.
+The Memory Core panel provides a read-only list with filters for all five memory
+layers.
 
 Validation commands:
 

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 
 import type { ProjectSnapshot } from "../../shared/project";
+import { MemoryCorePanel } from "./MemoryCorePanel";
 
 type SnapshotState =
   | { status: "loading" }
@@ -11,7 +12,7 @@ type ProjectAction = "idle" | "selecting" | "initializing";
 
 const systems = [
   { name: "Blueprint", detail: "Project intent available", phase: "READY" },
-  { name: "Memory Core", detail: "Storage engine reserved", phase: "PHASE 2" },
+  { name: "Memory Core", detail: "Local store and read view online", phase: "PHASE 2" },
   { name: "Harness Agent", detail: "Adapter boundary reserved", phase: "PHASE 3" },
   { name: "Health Center", detail: "Analysis boundary reserved", phase: "PHASE 4" },
 ];
@@ -211,6 +212,13 @@ function App() {
           ))}
         </div>
       </section>
+
+      {snapshotState.status === "ready" && (
+        <MemoryCorePanel
+          projectRoot={snapshotState.snapshot.projectRoot}
+          runtime={snapshotState.snapshot.memoryRuntime}
+        />
+      )}
     </main>
   );
 }

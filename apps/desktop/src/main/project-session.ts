@@ -7,7 +7,12 @@ import {
   type MemoryStore,
 } from "@vibe-project-harness/memory";
 
-import type { ProjectInitializationResult, ProjectSnapshot } from "../shared/project";
+import type {
+  MemoryItemSnapshot,
+  MemoryLayerId,
+  ProjectInitializationResult,
+  ProjectSnapshot,
+} from "../shared/project";
 import { initializeProject } from "./project-initializer";
 import { inspectProject, resolveProjectRoot } from "./project-inspector";
 
@@ -70,6 +75,19 @@ export class ProjectSession {
       ...result,
       snapshot: await this.getSnapshot(),
     };
+  }
+
+  async listMemoryItems(layer?: MemoryLayerId): Promise<MemoryItemSnapshot[]> {
+    const memoryStore = await this.getOrOpenMemoryStore();
+    const repository = new MemoryRepository(memoryStore);
+
+    return repository.list(layer).map((item) => ({
+      id: item.id,
+      layer: item.layer,
+      content: item.content,
+      createdAt: item.createdAt.toISOString(),
+      updatedAt: item.updatedAt.toISOString(),
+    }));
   }
 
   close(): void {

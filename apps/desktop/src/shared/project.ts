@@ -1,13 +1,26 @@
 export const PROJECT_SNAPSHOT_CHANNEL = "project:get-snapshot";
 export const PROJECT_SELECT_CHANNEL = "project:select";
 export const PROJECT_INITIALIZE_CHANNEL = "project:initialize";
+export const MEMORY_ITEMS_CHANNEL = "memory:list-items";
 
 export type VibeDirectoryStatus = "present" | "missing";
 
-export type MemoryLayerCounts = Record<
-  "working_set" | "active_memory" | "consolidated_memory" | "indexed_archive" | "expired",
-  number
->;
+export type MemoryLayerId =
+  | "working_set"
+  | "active_memory"
+  | "consolidated_memory"
+  | "indexed_archive"
+  | "expired";
+
+export type MemoryLayerCounts = Record<MemoryLayerId, number>;
+
+export interface MemoryItemSnapshot {
+  id: string;
+  layer: MemoryLayerId;
+  content: string;
+  createdAt: string;
+  updatedAt: string;
+}
 
 export type MemoryRuntimeSnapshot =
   | { status: "unavailable" }
@@ -33,4 +46,5 @@ export interface HarnessDesktopApi {
   getProjectSnapshot: () => Promise<ProjectSnapshot>;
   selectProject: () => Promise<ProjectSelectionResult>;
   initializeProject: () => Promise<ProjectInitializationResult>;
+  listMemoryItems: (layer?: MemoryLayerId) => Promise<MemoryItemSnapshot[]>;
 }

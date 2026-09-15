@@ -16,4 +16,5 @@ Phase 4: Health analysis and optimization.
 - TASK-004: Knowledge item persistence and schema v1-to-v2 migration completed.
 - TASK-005: Read-only desktop Memory Store status integration completed.
 - TASK-006: Explicit Knowledge Item content and layer mutations completed.
+- TASK-007: Read-only Memory Core desktop view completed.
 - Phase 1 completed. Phase 2 is active; memory lifecycle policy has not started.

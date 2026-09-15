@@ -14,6 +14,8 @@ Generated database state lives at `.vibe/runtime/memory.sqlite3` and is excluded
 from Git; version-controlled project metadata remains outside the runtime directory.
 The desktop project session owns a single shared Memory Store connection and closes
 it when the active project changes or the application quits.
+Knowledge Item reads cross IPC as renderer-safe data transfer objects with ISO
+timestamp strings; database and repository objects remain in the main process.
 
 The application contains:
 
