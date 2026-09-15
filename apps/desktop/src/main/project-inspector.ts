@@ -16,7 +16,10 @@ function readProjectArgument(args: string[]): string | undefined {
 
 export function resolveProjectRoot(): string {
   const configuredPath =
-    readProjectArgument(process.argv) ?? process.env.VIBE_PROJECT_PATH ?? process.cwd();
+    readProjectArgument(process.argv) ??
+    process.env.VIBE_PROJECT_PATH ??
+    process.env.INIT_CWD ??
+    process.cwd();
 
   return resolve(configuredPath);
 }
