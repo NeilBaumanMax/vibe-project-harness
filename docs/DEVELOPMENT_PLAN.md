@@ -12,4 +12,5 @@ Phase 4: Health analysis and optimization.
 
 - TASK-001: Desktop shell bootstrap completed.
 - TASK-002: Local project selection and `.vibe` metadata initialization completed.
-- Phase 1 completed. Phase 2 Memory Engine work has not started.
+- TASK-003: Local SQLite and Drizzle memory-store foundation completed.
+- Phase 1 completed. Phase 2 is active; memory domain behavior has not started.

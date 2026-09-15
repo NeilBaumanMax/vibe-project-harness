@@ -40,4 +40,5 @@ Validation commands:
 ```bash
 npm run typecheck
 npm run build
+npm test
 ```
