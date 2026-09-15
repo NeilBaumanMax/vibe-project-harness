@@ -31,6 +31,9 @@ npm run dev
 
 The desktop shell inspects the current working directory by default. Set
 `VIBE_PROJECT_PATH` before starting the app to inspect another local project.
+Mission Control can also open another local directory during the session. When a
+project has no `.vibe` directory, initialization creates only
+`.vibe/manifest.json`; it does not initialize the Memory Engine.
 
 Validation commands:
 

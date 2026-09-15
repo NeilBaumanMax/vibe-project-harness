@@ -7,6 +7,8 @@ type SnapshotState =
   | { status: "ready"; snapshot: ProjectSnapshot }
   | { status: "error"; message: string };
 
+type ProjectAction = "idle" | "selecting" | "initializing";
+
 const systems = [
   { name: "Blueprint", detail: "Project intent available", phase: "READY" },
   { name: "Memory Core", detail: "Storage engine reserved", phase: "PHASE 2" },
@@ -16,6 +18,8 @@ const systems = [
 
 function App() {
   const [snapshotState, setSnapshotState] = useState<SnapshotState>({ status: "loading" });
+  const [projectAction, setProjectAction] = useState<ProjectAction>("idle");
+  const [actionMessage, setActionMessage] = useState<string>();
 
   useEffect(() => {
     let isMounted = true;
@@ -39,6 +43,42 @@ function App() {
 
   const memoryStatus =
     snapshotState.status === "ready" ? snapshotState.snapshot.vibeDirectoryStatus : "scanning";
+
+  async function selectProject(): Promise<void> {
+    setProjectAction("selecting");
+    setActionMessage(undefined);
+
+    try {
+      const result = await window.harness.selectProject();
+
+      if (result.status === "selected") {
+        setSnapshotState({ status: "ready", snapshot: result.snapshot });
+      }
+    } catch (error) {
+      setActionMessage(error instanceof Error ? error.message : "Project selection failed");
+    } finally {
+      setProjectAction("idle");
+    }
+  }
+
+  async function initializeProject(): Promise<void> {
+    setProjectAction("initializing");
+    setActionMessage(undefined);
+
+    try {
+      const result = await window.harness.initializeProject();
+      setSnapshotState({ status: "ready", snapshot: result.snapshot });
+      setActionMessage(
+        result.status === "initialized"
+          ? "Project memory metadata initialized."
+          : "This project already has a .vibe directory.",
+      );
+    } catch (error) {
+      setActionMessage(error instanceof Error ? error.message : "Project initialization failed");
+    } finally {
+      setProjectAction("idle");
+    }
+  }
 
   return (
     <main className="mission-control">
@@ -77,11 +117,34 @@ function App() {
             <p className="section-label">ACTIVE PROJECT</p>
             <h2>Local project telemetry</h2>
           </div>
-          {snapshotState.status === "ready" && (
-            <span className={`status-chip status-chip--${snapshotState.snapshot.vibeDirectoryStatus}`}>
-              .vibe {snapshotState.snapshot.vibeDirectoryStatus}
-            </span>
-          )}
+          <div className="panel-actions">
+            {snapshotState.status === "ready" && (
+              <span className={`status-chip status-chip--${snapshotState.snapshot.vibeDirectoryStatus}`}>
+                .vibe {snapshotState.snapshot.vibeDirectoryStatus}
+              </span>
+            )}
+            <button
+              className="control-button control-button--secondary"
+              data-testid="select-project"
+              disabled={projectAction !== "idle"}
+              onClick={() => void selectProject()}
+              type="button"
+            >
+              {projectAction === "selecting" ? "Opening…" : "Open project"}
+            </button>
+            {snapshotState.status === "ready" &&
+              snapshotState.snapshot.vibeDirectoryStatus === "missing" && (
+                <button
+                  className="control-button"
+                  data-testid="initialize-project"
+                  disabled={projectAction !== "idle"}
+                  onClick={() => void initializeProject()}
+                  type="button"
+                >
+                  {projectAction === "initializing" ? "Initializing…" : "Initialize .vibe"}
+                </button>
+              )}
+          </div>
         </div>
 
         {snapshotState.status === "loading" && <p className="telemetry-message">Scanning project root…</p>}
@@ -100,6 +163,7 @@ function App() {
             </div>
           </dl>
         )}
+        {actionMessage && <p className="action-message">{actionMessage}</p>}
       </section>
 
       <section className="systems-section">

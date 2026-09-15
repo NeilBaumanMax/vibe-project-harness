@@ -178,6 +178,14 @@ h1 {
   gap: 24px;
 }
 
+.panel-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
 .panel-heading h2 {
   margin-bottom: 0;
   font-size: 18px;
@@ -198,6 +206,40 @@ h1 {
 .status-chip--missing {
   border-color: #705c39;
   color: #efc37a;
+}
+
+.control-button {
+  min-height: 30px;
+  padding: 6px 11px;
+  border: 1px solid #4aa994;
+  color: #b8f3e6;
+  background: rgba(74, 169, 148, 0.16);
+  font-family: "Cascadia Code", "SFMono-Regular", Consolas, monospace;
+  font-size: 9px;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.control-button:hover:not(:disabled) {
+  border-color: #73dfc8;
+  background: rgba(74, 169, 148, 0.25);
+}
+
+.control-button:focus-visible {
+  outline: 2px solid #8bf1dc;
+  outline-offset: 2px;
+}
+
+.control-button:disabled {
+  cursor: wait;
+  opacity: 0.55;
+}
+
+.control-button--secondary {
+  border-color: #365f58;
+  color: #8fb4ae;
+  background: transparent;
 }
 
 .telemetry-grid {
@@ -238,6 +280,12 @@ h1 {
 
 .telemetry-message--error {
   color: #efaa9e;
+}
+
+.action-message {
+  margin: 16px 0 0;
+  color: #a9c6c1;
+  font-size: 12px;
 }
 
 .systems-section {
@@ -331,6 +379,15 @@ h1 {
 
   .hero-panel {
     padding: 34px 24px;
+  }
+
+  .panel-heading {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .panel-actions {
+    justify-content: flex-start;
   }
 
   .systems-grid {

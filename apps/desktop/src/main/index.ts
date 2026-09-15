@@ -1,11 +1,37 @@
-import { app, BrowserWindow, ipcMain } from "electron";
+import { app, BrowserWindow, dialog, ipcMain } from "electron";
 import { join } from "node:path";
 
-import { PROJECT_SNAPSHOT_CHANNEL } from "../shared/project";
-import { inspectProject } from "./project-inspector";
+import {
+  PROJECT_INITIALIZE_CHANNEL,
+  PROJECT_SELECT_CHANNEL,
+  PROJECT_SNAPSHOT_CHANNEL,
+} from "../shared/project";
+import { ProjectSession } from "./project-session";
+
+const projectSession = new ProjectSession();
 
 function registerProjectHandlers(): void {
-  ipcMain.handle(PROJECT_SNAPSHOT_CHANNEL, () => inspectProject());
+  ipcMain.handle(PROJECT_SNAPSHOT_CHANNEL, () => projectSession.getSnapshot());
+  ipcMain.handle(PROJECT_SELECT_CHANNEL, async (event) => {
+    const ownerWindow = BrowserWindow.fromWebContents(event.sender);
+    const options: Electron.OpenDialogOptions = {
+      properties: ["openDirectory"],
+      title: "Open a project",
+    };
+    const result = ownerWindow
+      ? await dialog.showOpenDialog(ownerWindow, options)
+      : await dialog.showOpenDialog(options);
+
+    if (result.canceled || result.filePaths.length === 0) {
+      return { status: "cancelled" } as const;
+    }
+
+    return {
+      status: "selected" as const,
+      snapshot: await projectSession.select(result.filePaths[0]),
+    };
+  });
+  ipcMain.handle(PROJECT_INITIALIZE_CHANNEL, () => projectSession.initialize());
 }
 
 function createWindow(): void {
