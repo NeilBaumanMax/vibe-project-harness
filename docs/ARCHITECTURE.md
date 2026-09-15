@@ -16,6 +16,9 @@ The desktop project session owns a single shared Memory Store connection and clo
 it when the active project changes or the application quits.
 Knowledge Item reads cross IPC as renderer-safe data transfer objects with ISO
 timestamp strings; database and repository objects remain in the main process.
+The first desktop mutation command accepts Working Set text only. The main process
+validates and trims the content, generates its UUID and timestamp, and fixes the
+destination layer before writing through the Memory repository.
 
 The application contains:
 

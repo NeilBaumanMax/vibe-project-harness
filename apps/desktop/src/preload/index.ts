@@ -1,10 +1,12 @@
 import { contextBridge, ipcRenderer } from "electron";
 
 import {
+  MEMORY_CREATE_WORKING_SET_CHANNEL,
   MEMORY_ITEMS_CHANNEL,
   PROJECT_INITIALIZE_CHANNEL,
   PROJECT_SELECT_CHANNEL,
   PROJECT_SNAPSHOT_CHANNEL,
+  type CreateWorkingSetItemResult,
   type HarnessDesktopApi,
   type MemoryItemSnapshot,
   type MemoryLayerId,
@@ -22,6 +24,11 @@ const desktopApi: HarnessDesktopApi = {
     ipcRenderer.invoke(PROJECT_INITIALIZE_CHANNEL) as Promise<ProjectInitializationResult>,
   listMemoryItems: (layer?: MemoryLayerId) =>
     ipcRenderer.invoke(MEMORY_ITEMS_CHANNEL, layer) as Promise<MemoryItemSnapshot[]>,
+  createWorkingSetItem: (content: string) =>
+    ipcRenderer.invoke(
+      MEMORY_CREATE_WORKING_SET_CHANNEL,
+      content,
+    ) as Promise<CreateWorkingSetItemResult>,
 };
 
 contextBridge.exposeInMainWorld("harness", desktopApi);

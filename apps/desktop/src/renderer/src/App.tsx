@@ -215,6 +215,9 @@ function App() {
 
       {snapshotState.status === "ready" && (
         <MemoryCorePanel
+          onProjectSnapshotChange={(snapshot) =>
+            setSnapshotState({ status: "ready", snapshot })
+          }
           projectRoot={snapshotState.snapshot.projectRoot}
           runtime={snapshotState.snapshot.memoryRuntime}
         />

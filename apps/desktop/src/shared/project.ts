@@ -2,6 +2,7 @@ export const PROJECT_SNAPSHOT_CHANNEL = "project:get-snapshot";
 export const PROJECT_SELECT_CHANNEL = "project:select";
 export const PROJECT_INITIALIZE_CHANNEL = "project:initialize";
 export const MEMORY_ITEMS_CHANNEL = "memory:list-items";
+export const MEMORY_CREATE_WORKING_SET_CHANNEL = "memory:create-working-set-item";
 
 export type VibeDirectoryStatus = "present" | "missing";
 
@@ -42,9 +43,15 @@ export type ProjectInitializationResult =
   | { status: "initialized"; snapshot: ProjectSnapshot }
   | { status: "already-exists"; snapshot: ProjectSnapshot };
 
+export interface CreateWorkingSetItemResult {
+  item: MemoryItemSnapshot;
+  snapshot: ProjectSnapshot;
+}
+
 export interface HarnessDesktopApi {
   getProjectSnapshot: () => Promise<ProjectSnapshot>;
   selectProject: () => Promise<ProjectSelectionResult>;
   initializeProject: () => Promise<ProjectInitializationResult>;
   listMemoryItems: (layer?: MemoryLayerId) => Promise<MemoryItemSnapshot[]>;
+  createWorkingSetItem: (content: string) => Promise<CreateWorkingSetItemResult>;
 }

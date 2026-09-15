@@ -4,11 +4,13 @@ import type {
   MemoryItemSnapshot,
   MemoryLayerId,
   MemoryRuntimeSnapshot,
+  ProjectSnapshot,
 } from "../../shared/project";
 
 interface MemoryCorePanelProps {
   projectRoot: string;
   runtime: MemoryRuntimeSnapshot;
+  onProjectSnapshotChange: (snapshot: ProjectSnapshot) => void;
 }
 
 type LayerFilter = "all" | MemoryLayerId;
@@ -27,9 +29,17 @@ const layerLabels: Record<MemoryLayerId, string> = {
 
 const layerIds = Object.keys(layerLabels) as MemoryLayerId[];
 
-export function MemoryCorePanel({ projectRoot, runtime }: MemoryCorePanelProps) {
+export function MemoryCorePanel({
+  projectRoot,
+  runtime,
+  onProjectSnapshotChange,
+}: MemoryCorePanelProps) {
   const [selectedLayer, setSelectedLayer] = useState<LayerFilter>("all");
   const [itemState, setItemState] = useState<ItemState>({ status: "idle" });
+  const [draftContent, setDraftContent] = useState("");
+  const [captureState, setCaptureState] = useState<"idle" | "saving">("idle");
+  const [captureMessage, setCaptureMessage] = useState<string>();
+  const [refreshVersion, setRefreshVersion] = useState(0);
 
   useEffect(() => {
     if (runtime.status !== "ready") {
@@ -57,7 +67,24 @@ export function MemoryCorePanel({ projectRoot, runtime }: MemoryCorePanelProps) 
     return () => {
       isMounted = false;
     };
-  }, [projectRoot, runtime.status, selectedLayer]);
+  }, [projectRoot, runtime.status, selectedLayer, refreshVersion]);
+
+  async function captureWorkingSetItem(): Promise<void> {
+    setCaptureState("saving");
+    setCaptureMessage(undefined);
+
+    try {
+      const result = await window.harness.createWorkingSetItem(draftContent);
+      setDraftContent("");
+      setCaptureMessage("Captured in Working Set.");
+      onProjectSnapshotChange(result.snapshot);
+      setRefreshVersion((version) => version + 1);
+    } catch (error) {
+      setCaptureMessage(error instanceof Error ? error.message : "Knowledge Item could not be saved.");
+    } finally {
+      setCaptureState("idle");
+    }
+  }
 
   const totalCount =
     runtime.status === "ready"
@@ -82,6 +109,36 @@ export function MemoryCorePanel({ projectRoot, runtime }: MemoryCorePanelProps) 
       )}
       {runtime.status === "ready" && (
         <>
+          <form
+            className="memory-capture"
+            onSubmit={(event) => {
+              event.preventDefault();
+              void captureWorkingSetItem();
+            }}
+          >
+            <label htmlFor="working-set-content">Capture working context</label>
+            <div className="memory-capture__controls">
+              <textarea
+                data-testid="working-set-content"
+                disabled={captureState === "saving"}
+                id="working-set-content"
+                onChange={(event) => setDraftContent(event.target.value)}
+                placeholder="Record the current task context, constraint, or discovery…"
+                rows={3}
+                value={draftContent}
+              />
+              <button
+                className="control-button"
+                data-testid="capture-working-set"
+                disabled={captureState === "saving" || draftContent.trim().length === 0}
+                type="submit"
+              >
+                {captureState === "saving" ? "Capturing…" : "Capture"}
+              </button>
+            </div>
+            {captureMessage && <p className="capture-message">{captureMessage}</p>}
+          </form>
+
           <div className="layer-filters" aria-label="Memory layer filter">
             <button
               aria-pressed={selectedLayer === "all"}

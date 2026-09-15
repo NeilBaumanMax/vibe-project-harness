@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import { stat } from "node:fs/promises";
 import { resolve } from "node:path";
 
@@ -8,6 +9,7 @@ import {
 } from "@vibe-project-harness/memory";
 
 import type {
+  CreateWorkingSetItemResult,
   MemoryItemSnapshot,
   MemoryLayerId,
   ProjectInitializationResult,
@@ -15,6 +17,22 @@ import type {
 } from "../shared/project";
 import { initializeProject } from "./project-initializer";
 import { inspectProject, resolveProjectRoot } from "./project-inspector";
+
+function toMemoryItemSnapshot(item: {
+  id: string;
+  layer: MemoryLayerId;
+  content: string;
+  createdAt: Date;
+  updatedAt: Date;
+}): MemoryItemSnapshot {
+  return {
+    id: item.id,
+    layer: item.layer,
+    content: item.content,
+    createdAt: item.createdAt.toISOString(),
+    updatedAt: item.updatedAt.toISOString(),
+  };
+}
 
 export class ProjectSession {
   private projectRoot = resolveProjectRoot();
@@ -81,13 +99,33 @@ export class ProjectSession {
     const memoryStore = await this.getOrOpenMemoryStore();
     const repository = new MemoryRepository(memoryStore);
 
-    return repository.list(layer).map((item) => ({
-      id: item.id,
-      layer: item.layer,
-      content: item.content,
-      createdAt: item.createdAt.toISOString(),
-      updatedAt: item.updatedAt.toISOString(),
-    }));
+    return repository.list(layer).map(toMemoryItemSnapshot);
+  }
+
+  async createWorkingSetItem(content: unknown): Promise<CreateWorkingSetItemResult> {
+    if (typeof content !== "string") {
+      throw new Error("Knowledge Item content must be text.");
+    }
+
+    const normalizedContent = content.trim();
+
+    if (normalizedContent.length === 0) {
+      throw new Error("Knowledge Item content cannot be empty.");
+    }
+
+    const memoryStore = await this.getOrOpenMemoryStore();
+    const repository = new MemoryRepository(memoryStore);
+    const item = repository.create({
+      id: randomUUID(),
+      layer: "working_set",
+      content: normalizedContent,
+      timestamp: new Date(),
+    });
+
+    return {
+      item: toMemoryItemSnapshot(item),
+      snapshot: await this.getSnapshot(),
+    };
   }
 
   close(): void {
