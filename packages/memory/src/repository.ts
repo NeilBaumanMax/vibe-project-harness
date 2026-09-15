@@ -13,6 +13,18 @@ export interface CreateKnowledgeItemInput {
   timestamp?: Date;
 }
 
+export interface UpdateKnowledgeItemContentInput {
+  id: string;
+  content: string;
+  timestamp: Date;
+}
+
+export interface MoveKnowledgeItemInput {
+  id: string;
+  layer: MemoryLayer;
+  timestamp: Date;
+}
+
 export type MemoryLayerCounts = Record<MemoryLayer, number>;
 
 export class MemoryRepository {
@@ -43,6 +55,28 @@ export class MemoryRepository {
       .select()
       .from(knowledgeItems)
       .where(eq(knowledgeItems.id, id))
+      .get();
+  }
+
+  updateContent(input: UpdateKnowledgeItemContentInput): KnowledgeItem | undefined {
+    return this.store.database
+      .update(knowledgeItems)
+      .set({ content: input.content, updatedAt: input.timestamp })
+      .where(eq(knowledgeItems.id, input.id))
+      .returning()
+      .get();
+  }
+
+  moveToLayer(input: MoveKnowledgeItemInput): KnowledgeItem | undefined {
+    if (!isMemoryLayer(input.layer)) {
+      throw new Error(`Invalid memory layer: ${input.layer}`);
+    }
+
+    return this.store.database
+      .update(knowledgeItems)
+      .set({ layer: input.layer, updatedAt: input.timestamp })
+      .where(eq(knowledgeItems.id, input.id))
+      .returning()
       .get();
   }
 

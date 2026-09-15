@@ -112,6 +112,98 @@ test("rejects invalid layers before writing", async () => {
       /Invalid memory layer/,
     );
     assert.equal(repository.getById("invalid-item"), undefined);
+    repository.create({
+      id: "valid-item",
+      layer: "working_set",
+      content: "Valid",
+      timestamp: new Date("2026-09-15T12:00:00.000Z"),
+    });
+    assert.throws(
+      () =>
+        repository.moveToLayer({
+          id: "valid-item",
+          layer: "unknown",
+          timestamp: new Date("2026-09-15T12:01:00.000Z"),
+        }),
+      /Invalid memory layer/,
+    );
+    assert.equal(repository.getById("valid-item").layer, "working_set");
+    store.close();
+  } finally {
+    await rm(projectRoot, { recursive: true, force: true });
+  }
+});
+
+test("updates content and moves items without changing their creation time", async () => {
+  const projectRoot = await createInitializedProject();
+
+  try {
+    const store = await openMemoryStore(projectRoot);
+    const repository = new MemoryRepository(store);
+    const createdAt = new Date("2026-09-15T12:00:00.000Z");
+    const contentUpdatedAt = new Date("2026-09-15T12:05:00.000Z");
+    const movedAt = new Date("2026-09-15T12:10:00.000Z");
+
+    repository.create({
+      id: "mutable-item",
+      layer: "working_set",
+      content: "Initial content",
+      timestamp: createdAt,
+    });
+
+    const updated = repository.updateContent({
+      id: "mutable-item",
+      content: "Updated content",
+      timestamp: contentUpdatedAt,
+    });
+    assert.equal(updated.content, "Updated content");
+    assert.equal(updated.createdAt.toISOString(), createdAt.toISOString());
+    assert.equal(updated.updatedAt.toISOString(), contentUpdatedAt.toISOString());
+
+    const moved = repository.moveToLayer({
+      id: "mutable-item",
+      layer: "active_memory",
+      timestamp: movedAt,
+    });
+    assert.equal(moved.layer, "active_memory");
+    assert.equal(moved.createdAt.toISOString(), createdAt.toISOString());
+    assert.equal(moved.updatedAt.toISOString(), movedAt.toISOString());
+    assert.deepEqual(repository.countByLayer(), {
+      working_set: 0,
+      active_memory: 1,
+      consolidated_memory: 0,
+      indexed_archive: 0,
+      expired: 0,
+    });
+    store.close();
+
+    const reopenedStore = await openMemoryStore(projectRoot);
+    const reopenedRepository = new MemoryRepository(reopenedStore);
+    assert.equal(reopenedRepository.getById("mutable-item").content, "Updated content");
+    assert.equal(reopenedRepository.getById("mutable-item").layer, "active_memory");
+    reopenedStore.close();
+  } finally {
+    await rm(projectRoot, { recursive: true, force: true });
+  }
+});
+
+test("returns undefined when updating or moving an unknown item", async () => {
+  const projectRoot = await createInitializedProject();
+
+  try {
+    const store = await openMemoryStore(projectRoot);
+    const repository = new MemoryRepository(store);
+    const timestamp = new Date("2026-09-15T12:00:00.000Z");
+
+    assert.equal(
+      repository.updateContent({ id: "missing", content: "Unknown", timestamp }),
+      undefined,
+    );
+    assert.equal(
+      repository.moveToLayer({ id: "missing", layer: "expired", timestamp }),
+      undefined,
+    );
+    assert.deepEqual(repository.list(), []);
     store.close();
   } finally {
     await rm(projectRoot, { recursive: true, force: true });

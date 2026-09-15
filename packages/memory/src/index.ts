@@ -4,6 +4,8 @@ export {
   type CreateKnowledgeItemInput,
   type KnowledgeItem,
   type MemoryLayerCounts,
+  type MoveKnowledgeItemInput,
+  type UpdateKnowledgeItemContentInput,
 } from "./repository.js";
 export { harnessMetadata, knowledgeItems } from "./schema.js";
 export {

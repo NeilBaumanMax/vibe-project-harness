@@ -27,3 +27,7 @@ future lifecycle policy.
 
 Mission Control currently reports runtime readiness, schema version and aggregate
 item counts. Knowledge mutation is not exposed through the desktop UI.
+
+The repository supports explicit content updates and caller-directed layer moves.
+These operations require caller-supplied timestamps and do not apply automatic
+lifecycle policy.
