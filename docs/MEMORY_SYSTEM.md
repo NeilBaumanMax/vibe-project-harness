@@ -20,3 +20,7 @@ Knowledge candidates for removal.
 The five layer identifiers are defined by the Memory package. Its generated SQLite
 database is local runtime state under `.vibe/runtime`; promotion, consolidation,
 indexing and expiration behavior are not yet implemented.
+
+Knowledge items can currently be created, read and listed by layer. Callers provide
+IDs and may provide timestamps, keeping ingestion deterministic and separate from
+future lifecycle policy.

@@ -13,13 +13,13 @@ test("opens a project-local runtime database and preserves its schema version", 
     await mkdir(join(projectRoot, ".vibe"));
 
     const firstStore = await openMemoryStore(projectRoot);
-    assert.equal(firstStore.status.schemaVersion, 1);
+    assert.equal(firstStore.status.schemaVersion, 2);
     assert.deepEqual(firstStore.status.layers, MEMORY_LAYERS);
     await access(join(projectRoot, ".vibe", "runtime", "memory.sqlite3"));
     firstStore.close();
 
     const reopenedStore = await openMemoryStore(projectRoot);
-    assert.equal(reopenedStore.status.schemaVersion, 1);
+    assert.equal(reopenedStore.status.schemaVersion, 2);
     reopenedStore.close();
   } finally {
     await rm(projectRoot, { recursive: true, force: true });

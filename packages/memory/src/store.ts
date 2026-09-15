@@ -2,13 +2,11 @@ import { mkdir, stat } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import { DatabaseSync } from "node:sqlite";
 
-import { eq } from "drizzle-orm";
 import { drizzle, type NodeSQLiteDatabase } from "drizzle-orm/node-sqlite";
 
 import { MEMORY_LAYERS, type MemoryLayer } from "./layers.js";
-import { harnessMetadata } from "./schema.js";
+import { migrateMemorySchema } from "./migrations.js";
 
-const MEMORY_SCHEMA_VERSION = 1;
 const DATABASE_FILE_NAME = "memory.sqlite3";
 
 type MemoryDatabase = NodeSQLiteDatabase;
@@ -52,38 +50,25 @@ export async function openMemoryStore(projectRoot: string): Promise<MemoryStore>
 
   const databasePath = join(runtimeDirectoryPath, DATABASE_FILE_NAME);
   const sqlite = new DatabaseSync(databasePath, { timeout: 5_000 });
-  sqlite.exec("PRAGMA foreign_keys = ON;");
-  sqlite.exec(`
-    CREATE TABLE IF NOT EXISTS harness_metadata (
-      key TEXT PRIMARY KEY NOT NULL,
-      value TEXT NOT NULL
-    ) STRICT;
-  `);
 
-  const database = drizzle({ client: sqlite });
-  const schemaVersionEntry = database
-    .select()
-    .from(harnessMetadata)
-    .where(eq(harnessMetadata.key, "schema_version"))
-    .get();
+  try {
+    sqlite.exec("PRAGMA foreign_keys = ON;");
+    const schemaVersion = migrateMemorySchema(sqlite);
+    const database = drizzle({ client: sqlite });
 
-  if (schemaVersionEntry === undefined) {
-    database
-      .insert(harnessMetadata)
-      .values({ key: "schema_version", value: String(MEMORY_SCHEMA_VERSION) })
-      .run();
-  } else if (schemaVersionEntry.value !== String(MEMORY_SCHEMA_VERSION)) {
-    sqlite.close();
-    throw new Error(`Unsupported memory schema version: ${schemaVersionEntry.value}`);
+    return {
+      database,
+      status: {
+        databasePath,
+        schemaVersion,
+        layers: MEMORY_LAYERS,
+      },
+      close: () => {
+        if (sqlite.isOpen) sqlite.close();
+      },
+    };
+  } catch (error) {
+    if (sqlite.isOpen) sqlite.close();
+    throw error;
   }
-
-  return {
-    database,
-    status: {
-      databasePath,
-      schemaVersion: MEMORY_SCHEMA_VERSION,
-      layers: MEMORY_LAYERS,
-    },
-    close: () => sqlite.close(),
-  };
 }

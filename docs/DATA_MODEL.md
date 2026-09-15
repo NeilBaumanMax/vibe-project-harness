@@ -14,6 +14,10 @@ Entities:
 
 ## Current Implementation
 
-TASK-003 creates only the internal `harness_metadata` table used to identify the
-runtime schema version. Domain entity tables remain undefined until their behavior
-and lifecycle requirements are specified.
+The runtime schema currently contains:
+
+- `harness_metadata`: internal schema version metadata.
+- `knowledge_items`: caller-supplied ID, memory layer, content and timestamps.
+
+Other domain entity tables remain undefined until their behavior and lifecycle
+requirements are specified.

@@ -1,5 +1,10 @@
 export { isMemoryLayer, MEMORY_LAYERS, type MemoryLayer } from "./layers.js";
-export { harnessMetadata } from "./schema.js";
+export {
+  MemoryRepository,
+  type CreateKnowledgeItemInput,
+  type KnowledgeItem,
+} from "./repository.js";
+export { harnessMetadata, knowledgeItems } from "./schema.js";
 export {
   openMemoryStore,
   type MemoryStore,
