@@ -1,0 +1,27 @@
+project:
+  name: vibe-project-harness
+  type: electron-desktop
+
+stack:
+  frontend:
+    - Electron
+    - React
+    - TypeScript
+    - Vite
+  core:
+    - Node.js
+    - SQLite
+    - Drizzle ORM
+
+ai:
+  harness_agent:
+    runtime: Claude Code CLI
+    provider: DeepSeek
+
+memory:
+  layers:
+    - working_set
+    - active_memory
+    - consolidated_memory
+    - indexed_archive
+    - expired

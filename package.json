@@ -1,0 +1,14 @@
+{
+  "name": "vibe-project-harness",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Local AI engineering control core for Vibecoding projects",
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace @vibe-project-harness/desktop",
+    "build": "npm run build --workspace @vibe-project-harness/desktop",
+    "typecheck": "npm run typecheck --workspace @vibe-project-harness/desktop"
+  }
+}
