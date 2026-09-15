@@ -47,5 +47,6 @@ export async function inspectProject(projectRoot = resolveProjectRoot()): Promis
     projectRoot: normalizedProjectRoot,
     vibeDirectoryPath,
     vibeDirectoryStatus: vibeDirectoryExists ? "present" : "missing",
+    memoryRuntime: { status: "unavailable" },
   };
 }

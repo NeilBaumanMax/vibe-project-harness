@@ -42,7 +42,19 @@ function App() {
   }, []);
 
   const memoryStatus =
-    snapshotState.status === "ready" ? snapshotState.snapshot.vibeDirectoryStatus : "scanning";
+    snapshotState.status !== "ready"
+      ? "scanning"
+      : snapshotState.snapshot.vibeDirectoryStatus === "missing"
+        ? "missing"
+        : snapshotState.snapshot.memoryRuntime.status;
+
+  const memoryItemTotal =
+    snapshotState.status === "ready" && snapshotState.snapshot.memoryRuntime.status === "ready"
+      ? Object.values(snapshotState.snapshot.memoryRuntime.itemCounts).reduce(
+          (total, count) => total + count,
+          0,
+        )
+      : undefined;
 
   async function selectProject(): Promise<void> {
     setProjectAction("selecting");
@@ -161,7 +173,24 @@ function App() {
               <dt>Memory directory</dt>
               <dd>{snapshotState.snapshot.vibeDirectoryPath}</dd>
             </div>
+            {snapshotState.snapshot.memoryRuntime.status === "ready" && (
+              <>
+                <div>
+                  <dt>Memory schema</dt>
+                  <dd>Version {snapshotState.snapshot.memoryRuntime.schemaVersion}</dd>
+                </div>
+                <div>
+                  <dt>Knowledge items</dt>
+                  <dd>{memoryItemTotal}</dd>
+                </div>
+              </>
+            )}
           </dl>
+        )}
+        {snapshotState.status === "ready" && snapshotState.snapshot.memoryRuntime.status === "error" && (
+          <p className="telemetry-message telemetry-message--error">
+            {snapshotState.snapshot.memoryRuntime.message}
+          </p>
         )}
         {actionMessage && <p className="action-message">{actionMessage}</p>}
       </section>

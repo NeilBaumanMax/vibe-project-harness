@@ -34,6 +34,8 @@ The desktop shell inspects the current working directory by default. Set
 Mission Control can also open another local directory during the session. When a
 project has no `.vibe` directory, initialization creates only
 `.vibe/manifest.json`; it does not initialize the Memory Engine.
+For initialized projects, Mission Control opens the local memory runtime and reports
+its schema version and current knowledge-item total.
 
 Validation commands:
 

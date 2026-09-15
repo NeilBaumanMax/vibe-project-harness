@@ -24,3 +24,6 @@ indexing and expiration behavior are not yet implemented.
 Knowledge items can currently be created, read and listed by layer. Callers provide
 IDs and may provide timestamps, keeping ingestion deterministic and separate from
 future lifecycle policy.
+
+Mission Control currently reports runtime readiness, schema version and aggregate
+item counts. Knowledge mutation is not exposed through the desktop UI.

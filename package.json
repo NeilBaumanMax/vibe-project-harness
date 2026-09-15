@@ -8,9 +8,10 @@
     "packages/*"
   ],
   "scripts": {
+    "predev": "npm run build --workspace @vibe-project-harness/memory",
     "dev": "npm run dev --workspace @vibe-project-harness/desktop",
-    "build": "npm run build --workspaces --if-present",
-    "typecheck": "npm run typecheck --workspaces --if-present",
-    "test": "npm run test --workspaces --if-present"
+    "build": "npm run build --workspace @vibe-project-harness/memory && npm run build --workspace @vibe-project-harness/desktop",
+    "typecheck": "npm run typecheck --workspace @vibe-project-harness/memory && npm run typecheck --workspace @vibe-project-harness/desktop",
+    "test": "npm run test --workspace @vibe-project-harness/memory"
   }
 }

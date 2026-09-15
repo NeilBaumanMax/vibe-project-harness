@@ -10,6 +10,7 @@
     "typecheck": "tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.web.json"
   },
   "dependencies": {
+    "@vibe-project-harness/memory": "0.1.0",
     "react": "19.3.0",
     "react-dom": "19.3.0"
   },

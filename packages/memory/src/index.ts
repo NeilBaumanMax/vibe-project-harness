@@ -3,6 +3,7 @@ export {
   MemoryRepository,
   type CreateKnowledgeItemInput,
   type KnowledgeItem,
+  type MemoryLayerCounts,
 } from "./repository.js";
 export { harnessMetadata, knowledgeItems } from "./schema.js";
 export {

@@ -45,6 +45,13 @@ test("creates, reads and lists knowledge items by layer", async () => {
       repository.list().map((item) => item.id),
       ["item-001", "item-002"],
     );
+    assert.deepEqual(repository.countByLayer(), {
+      working_set: 1,
+      active_memory: 1,
+      consolidated_memory: 0,
+      indexed_archive: 0,
+      expired: 0,
+    });
     store.close();
   } finally {
     await rm(projectRoot, { recursive: true, force: true });

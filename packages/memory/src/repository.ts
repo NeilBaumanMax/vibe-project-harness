@@ -1,6 +1,6 @@
-import { asc, eq } from "drizzle-orm";
+import { asc, count, eq } from "drizzle-orm";
 
-import { isMemoryLayer, type MemoryLayer } from "./layers.js";
+import { isMemoryLayer, MEMORY_LAYERS, type MemoryLayer } from "./layers.js";
 import { knowledgeItems } from "./schema.js";
 import type { MemoryStore } from "./store.js";
 
@@ -12,6 +12,8 @@ export interface CreateKnowledgeItemInput {
   content: string;
   timestamp?: Date;
 }
+
+export type MemoryLayerCounts = Record<MemoryLayer, number>;
 
 export class MemoryRepository {
   constructor(private readonly store: MemoryStore) {}
@@ -63,5 +65,20 @@ export class MemoryRepository {
       .where(eq(knowledgeItems.layer, layer))
       .orderBy(asc(knowledgeItems.createdAt), asc(knowledgeItems.id))
       .all();
+  }
+
+  countByLayer(): MemoryLayerCounts {
+    const counts = Object.fromEntries(MEMORY_LAYERS.map((layer) => [layer, 0])) as MemoryLayerCounts;
+    const rows = this.store.database
+      .select({ layer: knowledgeItems.layer, count: count() })
+      .from(knowledgeItems)
+      .groupBy(knowledgeItems.layer)
+      .all();
+
+    for (const row of rows) {
+      counts[row.layer] = row.count;
+    }
+
+    return counts;
   }
 }
