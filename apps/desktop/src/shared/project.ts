@@ -7,6 +7,7 @@ export const MEMORY_PROMOTE_WORKING_SET_CHANNEL = "memory:promote-working-set-it
 export const MEMORY_UPDATE_ITEM_CONTENT_CHANNEL = "memory:update-item-content";
 export const MEMORY_DELETE_ITEM_CHANNEL = "memory:delete-item";
 export const MEMORY_EXPIRE_ITEM_CHANNEL = "memory:expire-item";
+export const MEMORY_RESTORE_ITEM_CHANNEL = "memory:restore-item";
 
 export type VibeDirectoryStatus = "present" | "missing";
 
@@ -57,6 +58,7 @@ export type PromoteWorkingSetItemResult = MemoryItemMutationResult;
 export type UpdateKnowledgeItemContentResult = MemoryItemMutationResult;
 export type DeleteKnowledgeItemResult = MemoryItemMutationResult;
 export type ExpireKnowledgeItemResult = MemoryItemMutationResult;
+export type RestoreKnowledgeItemResult = MemoryItemMutationResult;
 
 export interface HarnessDesktopApi {
   getProjectSnapshot: () => Promise<ProjectSnapshot>;
@@ -71,4 +73,5 @@ export interface HarnessDesktopApi {
   ) => Promise<UpdateKnowledgeItemContentResult>;
   deleteKnowledgeItem: (itemId: string) => Promise<DeleteKnowledgeItemResult>;
   expireKnowledgeItem: (itemId: string) => Promise<ExpireKnowledgeItemResult>;
+  restoreKnowledgeItem: (itemId: string) => Promise<RestoreKnowledgeItemResult>;
 }

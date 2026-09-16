@@ -46,6 +46,7 @@ export function MemoryCorePanel({
   const [savingItemId, setSavingItemId] = useState<string>();
   const [deletingItemId, setDeletingItemId] = useState<string>();
   const [expiringItemId, setExpiringItemId] = useState<string>();
+  const [restoringItemId, setRestoringItemId] = useState<string>();
   const [promotionMessage, setPromotionMessage] = useState<string>();
   const [refreshVersion, setRefreshVersion] = useState(0);
 
@@ -185,6 +186,26 @@ export function MemoryCorePanel({
     }
   }
 
+  async function restoreKnowledgeItem(itemId: string): Promise<void> {
+    if (!window.confirm("Restore this Knowledge Item to Working Set?")) return;
+
+    setRestoringItemId(itemId);
+    setPromotionMessage(undefined);
+
+    try {
+      const result = await window.harness.restoreKnowledgeItem(itemId);
+      setPromotionMessage("Knowledge Item restored to Working Set.");
+      onProjectSnapshotChange(result.snapshot);
+      setRefreshVersion((version) => version + 1);
+    } catch (error) {
+      setPromotionMessage(
+        error instanceof Error ? error.message : "Knowledge Item could not be restored.",
+      );
+    } finally {
+      setRestoringItemId(undefined);
+    }
+  }
+
   const totalCount =
     runtime.status === "ready"
       ? Object.values(runtime.itemCounts).reduce((total, count) => total + count, 0)
@@ -308,7 +329,8 @@ export function MemoryCorePanel({
                         promotingItemId !== undefined ||
                         savingItemId !== undefined ||
                         deletingItemId !== undefined ||
-                        expiringItemId !== undefined
+                        expiringItemId !== undefined ||
+                        restoringItemId !== undefined
                       }
                       onChange={(event) => setEditDraft(event.target.value)}
                       rows={4}
@@ -330,6 +352,7 @@ export function MemoryCorePanel({
                               savingItemId !== undefined ||
                               deletingItemId !== undefined ||
                               expiringItemId !== undefined ||
+                              restoringItemId !== undefined ||
                               editDraft.trim().length === 0
                             }
                             onClick={() => void saveItemEdit(item.id)}
@@ -344,7 +367,8 @@ export function MemoryCorePanel({
                               promotingItemId !== undefined ||
                               savingItemId !== undefined ||
                               deletingItemId !== undefined ||
-                              expiringItemId !== undefined
+                              expiringItemId !== undefined ||
+                              restoringItemId !== undefined
                             }
                             onClick={cancelEditing}
                             type="button"
@@ -361,7 +385,8 @@ export function MemoryCorePanel({
                             editingItemId !== undefined ||
                             savingItemId !== undefined ||
                             deletingItemId !== undefined ||
-                            expiringItemId !== undefined
+                            expiringItemId !== undefined ||
+                            restoringItemId !== undefined
                           }
                           onClick={() => beginEditing(item)}
                           type="button"
@@ -378,7 +403,8 @@ export function MemoryCorePanel({
                           editingItemId !== undefined ||
                           savingItemId !== undefined ||
                           deletingItemId !== undefined ||
-                          expiringItemId !== undefined
+                          expiringItemId !== undefined ||
+                          restoringItemId !== undefined
                         }
                         onClick={() => void promoteWorkingSetItem(item.id)}
                         type="button"
@@ -403,6 +429,24 @@ export function MemoryCorePanel({
                         {expiringItemId === item.id ? "Expiring…" : "Expire"}
                       </button>
                     )}
+                    {editingItemId !== item.id && item.layer === "expired" && (
+                      <button
+                        className="control-button control-button--secondary"
+                        data-testid={`restore-${item.id}`}
+                        disabled={
+                          promotingItemId !== undefined ||
+                          editingItemId !== undefined ||
+                          savingItemId !== undefined ||
+                          deletingItemId !== undefined ||
+                          expiringItemId !== undefined ||
+                          restoringItemId !== undefined
+                        }
+                        onClick={() => void restoreKnowledgeItem(item.id)}
+                        type="button"
+                      >
+                        {restoringItemId === item.id ? "Restoring…" : "Restore"}
+                      </button>
+                    )}
                     {editingItemId !== item.id && (
                       <button
                         className="control-button control-button--danger"
@@ -412,7 +456,8 @@ export function MemoryCorePanel({
                           editingItemId !== undefined ||
                           savingItemId !== undefined ||
                           deletingItemId !== undefined ||
-                          expiringItemId !== undefined
+                          expiringItemId !== undefined ||
+                          restoringItemId !== undefined
                         }
                         onClick={() => void deleteKnowledgeItem(item.id)}
                         type="button"

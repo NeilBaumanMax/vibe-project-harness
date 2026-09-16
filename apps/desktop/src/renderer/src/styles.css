@@ -257,6 +257,10 @@ h1 {
   color: #d8bd83;
 }
 
+.control-button--secondary[data-testid^="restore-"] {
+  color: #9ec8ef;
+}
+
 .telemetry-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;

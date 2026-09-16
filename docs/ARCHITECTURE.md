@@ -31,6 +31,8 @@ Memory reads accept an optional text query; the repository performs a determinis
 case-insensitive content match while keeping database access in the main process.
 Human expiration uses a dedicated command that validates the item and moves it to
 the fixed `expired` layer with a main-process timestamp.
+Restoration is the inverse explicit command: only Expired items can return to the
+fixed `working_set` layer.
 
 The application contains:
 

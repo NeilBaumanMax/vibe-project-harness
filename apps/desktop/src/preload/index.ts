@@ -4,6 +4,7 @@ import {
   MEMORY_CREATE_WORKING_SET_CHANNEL,
   MEMORY_DELETE_ITEM_CHANNEL,
   MEMORY_EXPIRE_ITEM_CHANNEL,
+  MEMORY_RESTORE_ITEM_CHANNEL,
   MEMORY_ITEMS_CHANNEL,
   MEMORY_PROMOTE_WORKING_SET_CHANNEL,
   MEMORY_UPDATE_ITEM_CONTENT_CHANNEL,
@@ -13,6 +14,7 @@ import {
   type CreateWorkingSetItemResult,
   type DeleteKnowledgeItemResult,
   type ExpireKnowledgeItemResult,
+  type RestoreKnowledgeItemResult,
   type HarnessDesktopApi,
   type MemoryItemSnapshot,
   type MemoryLayerId,
@@ -52,6 +54,8 @@ const desktopApi: HarnessDesktopApi = {
     ipcRenderer.invoke(MEMORY_DELETE_ITEM_CHANNEL, itemId) as Promise<DeleteKnowledgeItemResult>,
   expireKnowledgeItem: (itemId: string) =>
     ipcRenderer.invoke(MEMORY_EXPIRE_ITEM_CHANNEL, itemId) as Promise<ExpireKnowledgeItemResult>,
+  restoreKnowledgeItem: (itemId: string) =>
+    ipcRenderer.invoke(MEMORY_RESTORE_ITEM_CHANNEL, itemId) as Promise<RestoreKnowledgeItemResult>,
 };
 
 contextBridge.exposeInMainWorld("harness", desktopApi);

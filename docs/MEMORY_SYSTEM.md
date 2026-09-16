@@ -50,3 +50,5 @@ combined with the existing layer filter. Semantic retrieval and indexing remain
 unimplemented.
 Humans can mark one item as Expired after confirmation. This is an explicit move;
 automatic expiration policy and recovery are not implemented.
+An Expired item can be restored to Working Set after confirmation. Restoration is
+explicit and single-item; no automatic recovery policy exists.

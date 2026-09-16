@@ -23,4 +23,5 @@ Phase 4: Health analysis and optimization.
 - TASK-011: Manual Knowledge Item deletion completed.
 - TASK-012: Memory Core local text search completed.
 - TASK-013: Manual Knowledge Item expiration completed.
+- TASK-014: Manual Expired Knowledge Item restoration completed.
 - Phase 1 completed. Phase 2 is active; memory lifecycle policy has not started.

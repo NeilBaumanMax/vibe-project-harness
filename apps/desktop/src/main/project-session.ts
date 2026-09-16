@@ -17,6 +17,7 @@ import type {
   PromoteWorkingSetItemResult,
   ProjectInitializationResult,
   ProjectSnapshot,
+  RestoreKnowledgeItemResult,
   UpdateKnowledgeItemContentResult,
 } from "../shared/project";
 import { initializeProject } from "./project-initializer";
@@ -249,6 +250,39 @@ export class ProjectSession {
 
     return {
       item: toMemoryItemSnapshot(expiredItem),
+      snapshot: await this.getSnapshot(),
+    };
+  }
+
+  async restoreKnowledgeItem(itemId: unknown): Promise<RestoreKnowledgeItemResult> {
+    if (typeof itemId !== "string" || itemId.trim().length === 0) {
+      throw new Error("Knowledge Item ID must be non-empty text.");
+    }
+
+    const memoryStore = await this.getOrOpenMemoryStore();
+    const repository = new MemoryRepository(memoryStore);
+    const item = repository.getById(itemId.trim());
+
+    if (!item) {
+      throw new Error("Knowledge Item was not found.");
+    }
+
+    if (item.layer !== "expired") {
+      throw new Error("Only Expired items can be restored.");
+    }
+
+    const restoredItem = repository.moveToLayer({
+      id: item.id,
+      layer: "working_set",
+      timestamp: new Date(),
+    });
+
+    if (!restoredItem) {
+      throw new Error("Knowledge Item was not found.");
+    }
+
+    return {
+      item: toMemoryItemSnapshot(restoredItem),
       snapshot: await this.getSnapshot(),
     };
   }

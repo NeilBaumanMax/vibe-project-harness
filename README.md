@@ -47,6 +47,7 @@ Items can be deleted individually after an explicit confirmation.
 Memory Core also supports case-insensitive text search within the selected layer
 view.
 Items can be explicitly marked as Expired after confirmation.
+Expired items can be restored to Working Set after confirmation.
 
 Validation commands:
 
