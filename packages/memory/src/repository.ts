@@ -1,4 +1,4 @@
-import { asc, count, eq } from "drizzle-orm";
+import { and, asc, count, eq, like } from "drizzle-orm";
 
 import { isMemoryLayer, MEMORY_LAYERS, type MemoryLayer } from "./layers.js";
 import { knowledgeItems } from "./schema.js";
@@ -105,6 +105,25 @@ export class MemoryRepository {
       .select()
       .from(knowledgeItems)
       .where(eq(knowledgeItems.layer, layer))
+      .orderBy(asc(knowledgeItems.createdAt), asc(knowledgeItems.id))
+      .all();
+  }
+
+  search(query: string, layer?: MemoryLayer): KnowledgeItem[] {
+    const normalizedQuery = query.trim();
+
+    if (normalizedQuery.length === 0) return this.list(layer);
+    if (layer !== undefined && !isMemoryLayer(layer)) {
+      throw new Error(`Invalid memory layer: ${layer}`);
+    }
+
+    const contentMatch = like(knowledgeItems.content, `%${normalizedQuery}%`);
+    const condition = layer === undefined ? contentMatch : and(eq(knowledgeItems.layer, layer), contentMatch);
+
+    return this.store.database
+      .select()
+      .from(knowledgeItems)
+      .where(condition)
       .orderBy(asc(knowledgeItems.createdAt), asc(knowledgeItems.id))
       .all();
   }

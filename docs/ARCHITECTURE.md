@@ -27,6 +27,8 @@ process validates both, preserves identity, layer and creation time, and writes 
 new update timestamp.
 Single-item deletion also crosses a dedicated command after renderer confirmation;
 the main process validates the ID and owns the database mutation.
+Memory reads accept an optional text query; the repository performs a deterministic
+case-insensitive content match while keeping database access in the main process.
 
 The application contains:
 

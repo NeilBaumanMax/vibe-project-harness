@@ -37,7 +37,7 @@ function registerProjectHandlers(): void {
     };
   });
   ipcMain.handle(PROJECT_INITIALIZE_CHANNEL, () => projectSession.initialize());
-  ipcMain.handle(MEMORY_ITEMS_CHANNEL, (_event, layer) => projectSession.listMemoryItems(layer));
+  ipcMain.handle(MEMORY_ITEMS_CHANNEL, (_event, layer, query) => projectSession.listMemoryItems(layer, query));
   ipcMain.handle(MEMORY_CREATE_WORKING_SET_CHANNEL, (_event, content) =>
     projectSession.createWorkingSetItem(content),
   );

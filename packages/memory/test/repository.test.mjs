@@ -236,3 +236,22 @@ test("deletes a knowledge item and persists the removal after reopen", async () 
     await rm(projectRoot, { recursive: true, force: true });
   }
 });
+
+test("searches content and respects an optional layer filter", async () => {
+  const projectRoot = await createInitializedProject();
+
+  try {
+    const store = await openMemoryStore(projectRoot);
+    const repository = new MemoryRepository(store);
+    repository.create({ id: "search-working", layer: "working_set", content: "Current deployment context" });
+    repository.create({ id: "search-active", layer: "active_memory", content: "Deployment architecture rule" });
+    repository.create({ id: "other", layer: "active_memory", content: "Database migration" });
+
+    assert.deepEqual(repository.search("deployment").map((item) => item.id), ["search-working", "search-active"]);
+    assert.deepEqual(repository.search("DEPLOYMENT", "active_memory").map((item) => item.id), ["search-active"]);
+    assert.deepEqual(repository.search("  ").map((item) => item.id), ["search-working", "search-active", "other"]);
+    store.close();
+  } finally {
+    await rm(projectRoot, { recursive: true, force: true });
+  }
+});

@@ -35,6 +35,7 @@ export function MemoryCorePanel({
   onProjectSnapshotChange,
 }: MemoryCorePanelProps) {
   const [selectedLayer, setSelectedLayer] = useState<LayerFilter>("all");
+  const [searchQuery, setSearchQuery] = useState("");
   const [itemState, setItemState] = useState<ItemState>({ status: "idle" });
   const [draftContent, setDraftContent] = useState("");
   const [captureState, setCaptureState] = useState<"idle" | "saving">("idle");
@@ -56,7 +57,10 @@ export function MemoryCorePanel({
     let isMounted = true;
     setItemState({ status: "loading" });
 
-    window.harness.listMemoryItems(selectedLayer === "all" ? undefined : selectedLayer).then(
+    window.harness.listMemoryItems(
+      selectedLayer === "all" ? undefined : selectedLayer,
+      searchQuery,
+    ).then(
       (items) => {
         if (isMounted) setItemState({ status: "ready", items });
       },
@@ -73,7 +77,7 @@ export function MemoryCorePanel({
     return () => {
       isMounted = false;
     };
-  }, [projectRoot, runtime.status, selectedLayer, refreshVersion]);
+  }, [projectRoot, runtime.status, selectedLayer, searchQuery, refreshVersion]);
 
   async function captureWorkingSetItem(): Promise<void> {
     setCaptureState("saving");
@@ -244,6 +248,17 @@ export function MemoryCorePanel({
               </button>
             ))}
           </div>
+
+          <label className="memory-search">
+            <span>Search content</span>
+            <input
+              data-testid="memory-search"
+              onChange={(event) => setSearchQuery(event.target.value)}
+              placeholder="Find text in Knowledge Items"
+              type="search"
+              value={searchQuery}
+            />
+          </label>
 
           {itemState.status === "loading" && (
             <p className="telemetry-message">Reading local memory…</p>

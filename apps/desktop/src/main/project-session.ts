@@ -98,11 +98,11 @@ export class ProjectSession {
     };
   }
 
-  async listMemoryItems(layer?: MemoryLayerId): Promise<MemoryItemSnapshot[]> {
+  async listMemoryItems(layer?: MemoryLayerId, query?: string): Promise<MemoryItemSnapshot[]> {
     const memoryStore = await this.getOrOpenMemoryStore();
     const repository = new MemoryRepository(memoryStore);
 
-    return repository.list(layer).map(toMemoryItemSnapshot);
+    return (query?.trim() ? repository.search(query, layer) : repository.list(layer)).map(toMemoryItemSnapshot);
   }
 
   async createWorkingSetItem(content: unknown): Promise<CreateWorkingSetItemResult> {

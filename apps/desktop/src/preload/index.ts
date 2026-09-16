@@ -28,8 +28,8 @@ const desktopApi: HarnessDesktopApi = {
     ipcRenderer.invoke(PROJECT_SELECT_CHANNEL) as Promise<ProjectSelectionResult>,
   initializeProject: () =>
     ipcRenderer.invoke(PROJECT_INITIALIZE_CHANNEL) as Promise<ProjectInitializationResult>,
-  listMemoryItems: (layer?: MemoryLayerId) =>
-    ipcRenderer.invoke(MEMORY_ITEMS_CHANNEL, layer) as Promise<MemoryItemSnapshot[]>,
+  listMemoryItems: (layer?: MemoryLayerId, query?: string) =>
+    ipcRenderer.invoke(MEMORY_ITEMS_CHANNEL, layer, query) as Promise<MemoryItemSnapshot[]>,
   createWorkingSetItem: (content: string) =>
     ipcRenderer.invoke(
       MEMORY_CREATE_WORKING_SET_CHANNEL,

@@ -60,7 +60,7 @@ export interface HarnessDesktopApi {
   getProjectSnapshot: () => Promise<ProjectSnapshot>;
   selectProject: () => Promise<ProjectSelectionResult>;
   initializeProject: () => Promise<ProjectInitializationResult>;
-  listMemoryItems: (layer?: MemoryLayerId) => Promise<MemoryItemSnapshot[]>;
+  listMemoryItems: (layer?: MemoryLayerId, query?: string) => Promise<MemoryItemSnapshot[]>;
   createWorkingSetItem: (content: string) => Promise<CreateWorkingSetItemResult>;
   promoteWorkingSetItem: (itemId: string) => Promise<PromoteWorkingSetItemResult>;
   updateKnowledgeItemContent: (

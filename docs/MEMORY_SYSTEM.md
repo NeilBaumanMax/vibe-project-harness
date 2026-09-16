@@ -45,3 +45,6 @@ layers. Reads and manual Working Set capture are mediated by typed IPC. Editing,
 manual content edits, and promotion are mediated by typed IPC. Arbitrary layer
 moves are unavailable in the UI; deletion requires explicit confirmation and is
 mediated by typed IPC.
+The Memory Core supports deterministic case-insensitive search over item content,
+combined with the existing layer filter. Semantic retrieval and indexing remain
+unimplemented.
