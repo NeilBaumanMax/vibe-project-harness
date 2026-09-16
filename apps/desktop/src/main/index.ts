@@ -5,6 +5,7 @@ import {
   MEMORY_CREATE_WORKING_SET_CHANNEL,
   MEMORY_ITEMS_CHANNEL,
   MEMORY_PROMOTE_WORKING_SET_CHANNEL,
+  MEMORY_UPDATE_ITEM_CONTENT_CHANNEL,
   PROJECT_INITIALIZE_CHANNEL,
   PROJECT_SELECT_CHANNEL,
   PROJECT_SNAPSHOT_CHANNEL,
@@ -41,6 +42,9 @@ function registerProjectHandlers(): void {
   );
   ipcMain.handle(MEMORY_PROMOTE_WORKING_SET_CHANNEL, (_event, itemId) =>
     projectSession.promoteWorkingSetItem(itemId),
+  );
+  ipcMain.handle(MEMORY_UPDATE_ITEM_CONTENT_CHANNEL, (_event, itemId, content) =>
+    projectSession.updateKnowledgeItemContent(itemId, content),
   );
 }
 

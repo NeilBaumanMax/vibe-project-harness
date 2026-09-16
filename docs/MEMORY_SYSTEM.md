@@ -30,6 +30,9 @@ counts. A Human can manually capture text into the Working Set; the desktop main
 process owns validation, identity, timestamp and the fixed destination layer.
 Working Set items can be promoted to Active Memory only through an explicit Human
 action. The main process validates the current layer and owns the update timestamp.
+Humans can edit Knowledge Item content in place. Edits preserve the item identity,
+layer and creation time while updating the last-update timestamp in the main
+process.
 
 The repository supports explicit content updates and caller-directed layer moves.
 These operations require caller-supplied timestamps and do not apply automatic
@@ -37,4 +40,5 @@ lifecycle policy.
 
 The desktop Memory Core can list stored items and filter them across all five
 layers. Reads and manual Working Set capture are mediated by typed IPC. Editing,
-arbitrary layer moves and deletion remain unavailable in the UI.
+manual content edits, and promotion are mediated by typed IPC. Arbitrary layer
+moves and deletion remain unavailable in the UI.

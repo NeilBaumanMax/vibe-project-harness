@@ -19,4 +19,5 @@ Phase 4: Health analysis and optimization.
 - TASK-007: Read-only Memory Core desktop view completed.
 - TASK-008: Manual Working Set capture completed.
 - TASK-009: Human-approved Working Set promotion completed.
+- TASK-010: Manual Knowledge Item content edit completed.
 - Phase 1 completed. Phase 2 is active; memory lifecycle policy has not started.

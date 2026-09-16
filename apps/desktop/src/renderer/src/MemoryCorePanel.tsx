@@ -40,6 +40,9 @@ export function MemoryCorePanel({
   const [captureState, setCaptureState] = useState<"idle" | "saving">("idle");
   const [captureMessage, setCaptureMessage] = useState<string>();
   const [promotingItemId, setPromotingItemId] = useState<string>();
+  const [editingItemId, setEditingItemId] = useState<string>();
+  const [editDraft, setEditDraft] = useState("");
+  const [savingItemId, setSavingItemId] = useState<string>();
   const [promotionMessage, setPromotionMessage] = useState<string>();
   const [refreshVersion, setRefreshVersion] = useState(0);
 
@@ -103,6 +106,36 @@ export function MemoryCorePanel({
       );
     } finally {
       setPromotingItemId(undefined);
+    }
+  }
+
+  function beginEditing(item: MemoryItemSnapshot): void {
+    setEditingItemId(item.id);
+    setEditDraft(item.content);
+    setPromotionMessage(undefined);
+  }
+
+  function cancelEditing(): void {
+    setEditingItemId(undefined);
+    setEditDraft("");
+  }
+
+  async function saveItemEdit(itemId: string): Promise<void> {
+    setSavingItemId(itemId);
+    setPromotionMessage(undefined);
+
+    try {
+      const result = await window.harness.updateKnowledgeItemContent(itemId, editDraft);
+      setPromotionMessage("Knowledge Item saved.");
+      cancelEditing();
+      onProjectSnapshotChange(result.snapshot);
+      setRefreshVersion((version) => version + 1);
+    } catch (error) {
+      setPromotionMessage(
+        error instanceof Error ? error.message : "Knowledge Item could not be saved.",
+      );
+    } finally {
+      setSavingItemId(undefined);
     }
   }
 
@@ -210,20 +243,73 @@ export function MemoryCorePanel({
                       {new Date(item.updatedAt).toLocaleString()}
                     </time>
                   </div>
-                  <p>{item.content}</p>
+                  {editingItemId === item.id ? (
+                    <textarea
+                      className="memory-item__editor"
+                      data-testid={`edit-content-${item.id}`}
+                      disabled={promotingItemId !== undefined || savingItemId !== undefined}
+                      onChange={(event) => setEditDraft(event.target.value)}
+                      rows={4}
+                      value={editDraft}
+                    />
+                  ) : (
+                    <p>{item.content}</p>
+                  )}
                   <div className="memory-item__footer">
                     <code>{item.id}</code>
-                    {item.layer === "working_set" && (
+                    <div className="memory-item__actions">
+                      {editingItemId === item.id ? (
+                        <>
+                          <button
+                            className="control-button"
+                            data-testid={`save-edit-${item.id}`}
+                            disabled={
+                              promotingItemId !== undefined ||
+                              savingItemId !== undefined ||
+                              editDraft.trim().length === 0
+                            }
+                            onClick={() => void saveItemEdit(item.id)}
+                            type="button"
+                          >
+                            {savingItemId === item.id ? "Saving…" : "Save"}
+                          </button>
+                          <button
+                            className="control-button control-button--secondary"
+                            data-testid={`cancel-edit-${item.id}`}
+                            disabled={promotingItemId !== undefined || savingItemId !== undefined}
+                            onClick={cancelEditing}
+                            type="button"
+                          >
+                            Cancel
+                          </button>
+                        </>
+                      ) : (
+                        <button
+                          className="control-button control-button--secondary"
+                          data-testid={`edit-${item.id}`}
+                          disabled={
+                            promotingItemId !== undefined ||
+                            editingItemId !== undefined ||
+                            savingItemId !== undefined
+                          }
+                          onClick={() => beginEditing(item)}
+                          type="button"
+                        >
+                          Edit
+                        </button>
+                      )}
+                    {item.layer === "working_set" && editingItemId !== item.id && (
                       <button
                         className="control-button control-button--secondary"
                         data-testid={`promote-${item.id}`}
-                        disabled={promotingItemId !== undefined}
+                        disabled={promotingItemId !== undefined || editingItemId !== undefined}
                         onClick={() => void promoteWorkingSetItem(item.id)}
                         type="button"
                       >
                         {promotingItemId === item.id ? "Promoting…" : "Promote to Active"}
                       </button>
                     )}
+                    </div>
                   </div>
                 </article>
               ))}

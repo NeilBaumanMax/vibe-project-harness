@@ -22,6 +22,9 @@ destination layer before writing through the Memory repository.
 Manual promotion follows the same boundary: the renderer sends an item ID, while
 the main process verifies that the current layer is Working Set and moves it only
 to Active Memory with a main-process timestamp.
+Content edits send an item ID and text through a dedicated command. The main
+process validates both, preserves identity, layer and creation time, and writes a
+new update timestamp.
 
 The application contains:
 

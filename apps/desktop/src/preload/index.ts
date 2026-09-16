@@ -4,6 +4,7 @@ import {
   MEMORY_CREATE_WORKING_SET_CHANNEL,
   MEMORY_ITEMS_CHANNEL,
   MEMORY_PROMOTE_WORKING_SET_CHANNEL,
+  MEMORY_UPDATE_ITEM_CONTENT_CHANNEL,
   PROJECT_INITIALIZE_CHANNEL,
   PROJECT_SELECT_CHANNEL,
   PROJECT_SNAPSHOT_CHANNEL,
@@ -15,6 +16,7 @@ import {
   type ProjectInitializationResult,
   type ProjectSelectionResult,
   type ProjectSnapshot,
+  type UpdateKnowledgeItemContentResult,
 } from "../shared/project";
 
 const desktopApi: HarnessDesktopApi = {
@@ -36,6 +38,12 @@ const desktopApi: HarnessDesktopApi = {
       MEMORY_PROMOTE_WORKING_SET_CHANNEL,
       itemId,
     ) as Promise<PromoteWorkingSetItemResult>,
+  updateKnowledgeItemContent: (itemId: string, content: string) =>
+    ipcRenderer.invoke(
+      MEMORY_UPDATE_ITEM_CONTENT_CHANNEL,
+      itemId,
+      content,
+    ) as Promise<UpdateKnowledgeItemContentResult>,
 };
 
 contextBridge.exposeInMainWorld("harness", desktopApi);

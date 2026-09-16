@@ -41,6 +41,8 @@ manually capture text into the active project's Working Set; item identity,
 timestamp and destination layer are controlled by the main process.
 Working Set items can be explicitly promoted to Active Memory from their item card.
 The main process validates the source layer and fixes the destination.
+Human operators can also edit item content in place; the main process preserves
+identity, layer and creation time while generating the new update timestamp.
 
 Validation commands:
 

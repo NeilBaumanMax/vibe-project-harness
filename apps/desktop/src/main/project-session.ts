@@ -15,6 +15,7 @@ import type {
   PromoteWorkingSetItemResult,
   ProjectInitializationResult,
   ProjectSnapshot,
+  UpdateKnowledgeItemContentResult,
 } from "../shared/project";
 import { initializeProject } from "./project-initializer";
 import { inspectProject, resolveProjectRoot } from "./project-inspector";
@@ -158,6 +159,42 @@ export class ProjectSession {
 
     return {
       item: toMemoryItemSnapshot(promotedItem),
+      snapshot: await this.getSnapshot(),
+    };
+  }
+
+  async updateKnowledgeItemContent(
+    itemId: unknown,
+    content: unknown,
+  ): Promise<UpdateKnowledgeItemContentResult> {
+    if (typeof itemId !== "string" || itemId.trim().length === 0) {
+      throw new Error("Knowledge Item ID must be non-empty text.");
+    }
+
+    if (typeof content !== "string" || content.trim().length === 0) {
+      throw new Error("Knowledge Item content cannot be empty.");
+    }
+
+    const memoryStore = await this.getOrOpenMemoryStore();
+    const repository = new MemoryRepository(memoryStore);
+    const item = repository.getById(itemId.trim());
+
+    if (!item) {
+      throw new Error("Knowledge Item was not found.");
+    }
+
+    const updatedItem = repository.updateContent({
+      id: item.id,
+      content: content.trim(),
+      timestamp: new Date(),
+    });
+
+    if (!updatedItem) {
+      throw new Error("Knowledge Item was not found.");
+    }
+
+    return {
+      item: toMemoryItemSnapshot(updatedItem),
       snapshot: await this.getSnapshot(),
     };
   }

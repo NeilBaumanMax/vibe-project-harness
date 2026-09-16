@@ -469,6 +469,31 @@ h1 {
   flex: none;
 }
 
+.memory-item__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.memory-item__editor {
+  width: 100%;
+  resize: vertical;
+  border: 1px solid #294a44;
+  outline: none;
+  color: #c7d9d6;
+  background: #091719;
+  padding: 11px 12px;
+  font: inherit;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.memory-item__editor:focus {
+  border-color: #59bca8;
+  box-shadow: 0 0 0 2px rgba(89, 188, 168, 0.1);
+}
+
 .section-heading {
   align-items: center;
   margin-bottom: 13px;
