@@ -33,6 +33,8 @@ action. The main process validates the current layer and owns the update timesta
 Humans can edit Knowledge Item content in place. Edits preserve the item identity,
 layer and creation time while updating the last-update timestamp in the main
 process.
+Humans can permanently delete one item after an explicit confirmation. Automatic
+cleanup and expiration policy are not part of this operation.
 
 The repository supports explicit content updates and caller-directed layer moves.
 These operations require caller-supplied timestamps and do not apply automatic
@@ -41,4 +43,5 @@ lifecycle policy.
 The desktop Memory Core can list stored items and filter them across all five
 layers. Reads and manual Working Set capture are mediated by typed IPC. Editing,
 manual content edits, and promotion are mediated by typed IPC. Arbitrary layer
-moves and deletion remain unavailable in the UI.
+moves are unavailable in the UI; deletion requires explicit confirmation and is
+mediated by typed IPC.

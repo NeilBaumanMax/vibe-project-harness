@@ -25,6 +25,8 @@ to Active Memory with a main-process timestamp.
 Content edits send an item ID and text through a dedicated command. The main
 process validates both, preserves identity, layer and creation time, and writes a
 new update timestamp.
+Single-item deletion also crosses a dedicated command after renderer confirmation;
+the main process validates the ID and owns the database mutation.
 
 The application contains:
 

@@ -43,6 +43,7 @@ Working Set items can be explicitly promoted to Active Memory from their item ca
 The main process validates the source layer and fixes the destination.
 Human operators can also edit item content in place; the main process preserves
 identity, layer and creation time while generating the new update timestamp.
+Items can be deleted individually after an explicit confirmation.
 
 Validation commands:
 

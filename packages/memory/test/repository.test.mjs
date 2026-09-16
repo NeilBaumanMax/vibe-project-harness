@@ -209,3 +209,30 @@ test("returns undefined when updating or moving an unknown item", async () => {
     await rm(projectRoot, { recursive: true, force: true });
   }
 });
+
+test("deletes a knowledge item and persists the removal after reopen", async () => {
+  const projectRoot = await createInitializedProject();
+
+  try {
+    const store = await openMemoryStore(projectRoot);
+    const repository = new MemoryRepository(store);
+    repository.create({
+      id: "deletable-item",
+      layer: "working_set",
+      content: "Remove this item",
+      timestamp: new Date("2026-09-15T12:00:00.000Z"),
+    });
+
+    const deleted = repository.deleteById("deletable-item");
+    assert.equal(deleted.id, "deletable-item");
+    assert.equal(repository.getById("deletable-item"), undefined);
+    assert.equal(repository.deleteById("deletable-item"), undefined);
+    store.close();
+
+    const reopenedStore = await openMemoryStore(projectRoot);
+    assert.equal(new MemoryRepository(reopenedStore).list().length, 0);
+    reopenedStore.close();
+  } finally {
+    await rm(projectRoot, { recursive: true, force: true });
+  }
+});

@@ -10,6 +10,7 @@ import {
 
 import type {
   CreateWorkingSetItemResult,
+  DeleteKnowledgeItemResult,
   MemoryItemSnapshot,
   MemoryLayerId,
   PromoteWorkingSetItemResult,
@@ -195,6 +196,25 @@ export class ProjectSession {
 
     return {
       item: toMemoryItemSnapshot(updatedItem),
+      snapshot: await this.getSnapshot(),
+    };
+  }
+
+  async deleteKnowledgeItem(itemId: unknown): Promise<DeleteKnowledgeItemResult> {
+    if (typeof itemId !== "string" || itemId.trim().length === 0) {
+      throw new Error("Knowledge Item ID must be non-empty text.");
+    }
+
+    const memoryStore = await this.getOrOpenMemoryStore();
+    const repository = new MemoryRepository(memoryStore);
+    const deletedItem = repository.deleteById(itemId.trim());
+
+    if (!deletedItem) {
+      throw new Error("Knowledge Item was not found.");
+    }
+
+    return {
+      item: toMemoryItemSnapshot(deletedItem),
       snapshot: await this.getSnapshot(),
     };
   }

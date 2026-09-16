@@ -20,4 +20,5 @@ Phase 4: Health analysis and optimization.
 - TASK-008: Manual Working Set capture completed.
 - TASK-009: Human-approved Working Set promotion completed.
 - TASK-010: Manual Knowledge Item content edit completed.
+- TASK-011: Manual Knowledge Item deletion completed.
 - Phase 1 completed. Phase 2 is active; memory lifecycle policy has not started.

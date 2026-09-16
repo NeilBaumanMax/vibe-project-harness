@@ -242,6 +242,17 @@ h1 {
   background: transparent;
 }
 
+.control-button--danger {
+  border-color: #8b4e4e;
+  color: #efb0a8;
+  background: rgba(139, 78, 78, 0.14);
+}
+
+.control-button--danger:hover:not(:disabled) {
+  border-color: #d87870;
+  background: rgba(139, 78, 78, 0.25);
+}
+
 .telemetry-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;

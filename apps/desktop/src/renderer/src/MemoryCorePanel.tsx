@@ -43,6 +43,7 @@ export function MemoryCorePanel({
   const [editingItemId, setEditingItemId] = useState<string>();
   const [editDraft, setEditDraft] = useState("");
   const [savingItemId, setSavingItemId] = useState<string>();
+  const [deletingItemId, setDeletingItemId] = useState<string>();
   const [promotionMessage, setPromotionMessage] = useState<string>();
   const [refreshVersion, setRefreshVersion] = useState(0);
 
@@ -136,6 +137,26 @@ export function MemoryCorePanel({
       );
     } finally {
       setSavingItemId(undefined);
+    }
+  }
+
+  async function deleteKnowledgeItem(itemId: string): Promise<void> {
+    if (!window.confirm("Delete this Knowledge Item permanently?")) return;
+
+    setDeletingItemId(itemId);
+    setPromotionMessage(undefined);
+
+    try {
+      const result = await window.harness.deleteKnowledgeItem(itemId);
+      setPromotionMessage("Knowledge Item deleted.");
+      onProjectSnapshotChange(result.snapshot);
+      setRefreshVersion((version) => version + 1);
+    } catch (error) {
+      setPromotionMessage(
+        error instanceof Error ? error.message : "Knowledge Item could not be deleted.",
+      );
+    } finally {
+      setDeletingItemId(undefined);
     }
   }
 
@@ -247,7 +268,11 @@ export function MemoryCorePanel({
                     <textarea
                       className="memory-item__editor"
                       data-testid={`edit-content-${item.id}`}
-                      disabled={promotingItemId !== undefined || savingItemId !== undefined}
+                      disabled={
+                        promotingItemId !== undefined ||
+                        savingItemId !== undefined ||
+                        deletingItemId !== undefined
+                      }
                       onChange={(event) => setEditDraft(event.target.value)}
                       rows={4}
                       value={editDraft}
@@ -266,6 +291,7 @@ export function MemoryCorePanel({
                             disabled={
                               promotingItemId !== undefined ||
                               savingItemId !== undefined ||
+                              deletingItemId !== undefined ||
                               editDraft.trim().length === 0
                             }
                             onClick={() => void saveItemEdit(item.id)}
@@ -276,7 +302,11 @@ export function MemoryCorePanel({
                           <button
                             className="control-button control-button--secondary"
                             data-testid={`cancel-edit-${item.id}`}
-                            disabled={promotingItemId !== undefined || savingItemId !== undefined}
+                            disabled={
+                              promotingItemId !== undefined ||
+                              savingItemId !== undefined ||
+                              deletingItemId !== undefined
+                            }
                             onClick={cancelEditing}
                             type="button"
                           >
@@ -290,7 +320,8 @@ export function MemoryCorePanel({
                           disabled={
                             promotingItemId !== undefined ||
                             editingItemId !== undefined ||
-                            savingItemId !== undefined
+                            savingItemId !== undefined ||
+                            deletingItemId !== undefined
                           }
                           onClick={() => beginEditing(item)}
                           type="button"
@@ -302,11 +333,32 @@ export function MemoryCorePanel({
                       <button
                         className="control-button control-button--secondary"
                         data-testid={`promote-${item.id}`}
-                        disabled={promotingItemId !== undefined || editingItemId !== undefined}
+                        disabled={
+                          promotingItemId !== undefined ||
+                          editingItemId !== undefined ||
+                          savingItemId !== undefined ||
+                          deletingItemId !== undefined
+                        }
                         onClick={() => void promoteWorkingSetItem(item.id)}
                         type="button"
                       >
                         {promotingItemId === item.id ? "Promoting…" : "Promote to Active"}
+                      </button>
+                    )}
+                    {editingItemId !== item.id && (
+                      <button
+                        className="control-button control-button--danger"
+                        data-testid={`delete-${item.id}`}
+                        disabled={
+                          promotingItemId !== undefined ||
+                          editingItemId !== undefined ||
+                          savingItemId !== undefined ||
+                          deletingItemId !== undefined
+                        }
+                        onClick={() => void deleteKnowledgeItem(item.id)}
+                        type="button"
+                      >
+                        {deletingItemId === item.id ? "Deleting…" : "Delete"}
                       </button>
                     )}
                     </div>

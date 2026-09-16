@@ -80,6 +80,14 @@ export class MemoryRepository {
       .get();
   }
 
+  deleteById(id: string): KnowledgeItem | undefined {
+    return this.store.database
+      .delete(knowledgeItems)
+      .where(eq(knowledgeItems.id, id))
+      .returning()
+      .get();
+  }
+
   list(layer?: MemoryLayer): KnowledgeItem[] {
     if (layer !== undefined && !isMemoryLayer(layer)) {
       throw new Error(`Invalid memory layer: ${layer}`);
