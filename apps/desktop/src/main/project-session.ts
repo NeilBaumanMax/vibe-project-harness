@@ -11,6 +11,7 @@ import {
 import type {
   CreateWorkingSetItemResult,
   DeleteKnowledgeItemResult,
+  ExpireKnowledgeItemResult,
   MemoryItemSnapshot,
   MemoryLayerId,
   PromoteWorkingSetItemResult,
@@ -215,6 +216,39 @@ export class ProjectSession {
 
     return {
       item: toMemoryItemSnapshot(deletedItem),
+      snapshot: await this.getSnapshot(),
+    };
+  }
+
+  async expireKnowledgeItem(itemId: unknown): Promise<ExpireKnowledgeItemResult> {
+    if (typeof itemId !== "string" || itemId.trim().length === 0) {
+      throw new Error("Knowledge Item ID must be non-empty text.");
+    }
+
+    const memoryStore = await this.getOrOpenMemoryStore();
+    const repository = new MemoryRepository(memoryStore);
+    const item = repository.getById(itemId.trim());
+
+    if (!item) {
+      throw new Error("Knowledge Item was not found.");
+    }
+
+    if (item.layer === "expired") {
+      throw new Error("Knowledge Item is already expired.");
+    }
+
+    const expiredItem = repository.moveToLayer({
+      id: item.id,
+      layer: "expired",
+      timestamp: new Date(),
+    });
+
+    if (!expiredItem) {
+      throw new Error("Knowledge Item was not found.");
+    }
+
+    return {
+      item: toMemoryItemSnapshot(expiredItem),
       snapshot: await this.getSnapshot(),
     };
   }

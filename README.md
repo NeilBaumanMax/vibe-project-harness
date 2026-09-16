@@ -46,6 +46,7 @@ identity, layer and creation time while generating the new update timestamp.
 Items can be deleted individually after an explicit confirmation.
 Memory Core also supports case-insensitive text search within the selected layer
 view.
+Items can be explicitly marked as Expired after confirmation.
 
 Validation commands:
 

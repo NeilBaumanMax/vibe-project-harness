@@ -45,6 +45,7 @@ export function MemoryCorePanel({
   const [editDraft, setEditDraft] = useState("");
   const [savingItemId, setSavingItemId] = useState<string>();
   const [deletingItemId, setDeletingItemId] = useState<string>();
+  const [expiringItemId, setExpiringItemId] = useState<string>();
   const [promotionMessage, setPromotionMessage] = useState<string>();
   const [refreshVersion, setRefreshVersion] = useState(0);
 
@@ -161,6 +162,26 @@ export function MemoryCorePanel({
       );
     } finally {
       setDeletingItemId(undefined);
+    }
+  }
+
+  async function expireKnowledgeItem(itemId: string): Promise<void> {
+    if (!window.confirm("Mark this Knowledge Item as expired?")) return;
+
+    setExpiringItemId(itemId);
+    setPromotionMessage(undefined);
+
+    try {
+      const result = await window.harness.expireKnowledgeItem(itemId);
+      setPromotionMessage("Knowledge Item marked expired.");
+      onProjectSnapshotChange(result.snapshot);
+      setRefreshVersion((version) => version + 1);
+    } catch (error) {
+      setPromotionMessage(
+        error instanceof Error ? error.message : "Knowledge Item could not be expired.",
+      );
+    } finally {
+      setExpiringItemId(undefined);
     }
   }
 
@@ -286,7 +307,8 @@ export function MemoryCorePanel({
                       disabled={
                         promotingItemId !== undefined ||
                         savingItemId !== undefined ||
-                        deletingItemId !== undefined
+                        deletingItemId !== undefined ||
+                        expiringItemId !== undefined
                       }
                       onChange={(event) => setEditDraft(event.target.value)}
                       rows={4}
@@ -307,6 +329,7 @@ export function MemoryCorePanel({
                               promotingItemId !== undefined ||
                               savingItemId !== undefined ||
                               deletingItemId !== undefined ||
+                              expiringItemId !== undefined ||
                               editDraft.trim().length === 0
                             }
                             onClick={() => void saveItemEdit(item.id)}
@@ -320,7 +343,8 @@ export function MemoryCorePanel({
                             disabled={
                               promotingItemId !== undefined ||
                               savingItemId !== undefined ||
-                              deletingItemId !== undefined
+                              deletingItemId !== undefined ||
+                              expiringItemId !== undefined
                             }
                             onClick={cancelEditing}
                             type="button"
@@ -336,7 +360,8 @@ export function MemoryCorePanel({
                             promotingItemId !== undefined ||
                             editingItemId !== undefined ||
                             savingItemId !== undefined ||
-                            deletingItemId !== undefined
+                            deletingItemId !== undefined ||
+                            expiringItemId !== undefined
                           }
                           onClick={() => beginEditing(item)}
                           type="button"
@@ -352,12 +377,30 @@ export function MemoryCorePanel({
                           promotingItemId !== undefined ||
                           editingItemId !== undefined ||
                           savingItemId !== undefined ||
-                          deletingItemId !== undefined
+                          deletingItemId !== undefined ||
+                          expiringItemId !== undefined
                         }
                         onClick={() => void promoteWorkingSetItem(item.id)}
                         type="button"
                       >
                         {promotingItemId === item.id ? "Promoting…" : "Promote to Active"}
+                      </button>
+                    )}
+                    {editingItemId !== item.id && item.layer !== "expired" && (
+                      <button
+                        className="control-button control-button--secondary"
+                        data-testid={`expire-${item.id}`}
+                        disabled={
+                          promotingItemId !== undefined ||
+                          editingItemId !== undefined ||
+                          savingItemId !== undefined ||
+                          deletingItemId !== undefined ||
+                          expiringItemId !== undefined
+                        }
+                        onClick={() => void expireKnowledgeItem(item.id)}
+                        type="button"
+                      >
+                        {expiringItemId === item.id ? "Expiring…" : "Expire"}
                       </button>
                     )}
                     {editingItemId !== item.id && (
@@ -368,7 +411,8 @@ export function MemoryCorePanel({
                           promotingItemId !== undefined ||
                           editingItemId !== undefined ||
                           savingItemId !== undefined ||
-                          deletingItemId !== undefined
+                          deletingItemId !== undefined ||
+                          expiringItemId !== undefined
                         }
                         onClick={() => void deleteKnowledgeItem(item.id)}
                         type="button"

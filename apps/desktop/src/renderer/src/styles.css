@@ -253,6 +253,10 @@ h1 {
   background: rgba(139, 78, 78, 0.25);
 }
 
+.control-button--secondary[data-testid^="expire-"] {
+  color: #d8bd83;
+}
+
 .telemetry-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;

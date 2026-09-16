@@ -48,3 +48,5 @@ mediated by typed IPC.
 The Memory Core supports deterministic case-insensitive search over item content,
 combined with the existing layer filter. Semantic retrieval and indexing remain
 unimplemented.
+Humans can mark one item as Expired after confirmation. This is an explicit move;
+automatic expiration policy and recovery are not implemented.

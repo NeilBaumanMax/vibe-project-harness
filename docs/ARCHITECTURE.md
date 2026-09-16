@@ -29,6 +29,8 @@ Single-item deletion also crosses a dedicated command after renderer confirmatio
 the main process validates the ID and owns the database mutation.
 Memory reads accept an optional text query; the repository performs a deterministic
 case-insensitive content match while keeping database access in the main process.
+Human expiration uses a dedicated command that validates the item and moves it to
+the fixed `expired` layer with a main-process timestamp.
 
 The application contains:
 

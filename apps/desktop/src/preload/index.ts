@@ -3,6 +3,7 @@ import { contextBridge, ipcRenderer } from "electron";
 import {
   MEMORY_CREATE_WORKING_SET_CHANNEL,
   MEMORY_DELETE_ITEM_CHANNEL,
+  MEMORY_EXPIRE_ITEM_CHANNEL,
   MEMORY_ITEMS_CHANNEL,
   MEMORY_PROMOTE_WORKING_SET_CHANNEL,
   MEMORY_UPDATE_ITEM_CONTENT_CHANNEL,
@@ -11,6 +12,7 @@ import {
   PROJECT_SNAPSHOT_CHANNEL,
   type CreateWorkingSetItemResult,
   type DeleteKnowledgeItemResult,
+  type ExpireKnowledgeItemResult,
   type HarnessDesktopApi,
   type MemoryItemSnapshot,
   type MemoryLayerId,
@@ -48,6 +50,8 @@ const desktopApi: HarnessDesktopApi = {
     ) as Promise<UpdateKnowledgeItemContentResult>,
   deleteKnowledgeItem: (itemId: string) =>
     ipcRenderer.invoke(MEMORY_DELETE_ITEM_CHANNEL, itemId) as Promise<DeleteKnowledgeItemResult>,
+  expireKnowledgeItem: (itemId: string) =>
+    ipcRenderer.invoke(MEMORY_EXPIRE_ITEM_CHANNEL, itemId) as Promise<ExpireKnowledgeItemResult>,
 };
 
 contextBridge.exposeInMainWorld("harness", desktopApi);

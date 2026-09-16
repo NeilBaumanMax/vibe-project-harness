@@ -4,6 +4,7 @@ import { join } from "node:path";
 import {
   MEMORY_CREATE_WORKING_SET_CHANNEL,
   MEMORY_DELETE_ITEM_CHANNEL,
+  MEMORY_EXPIRE_ITEM_CHANNEL,
   MEMORY_ITEMS_CHANNEL,
   MEMORY_PROMOTE_WORKING_SET_CHANNEL,
   MEMORY_UPDATE_ITEM_CONTENT_CHANNEL,
@@ -49,6 +50,9 @@ function registerProjectHandlers(): void {
   );
   ipcMain.handle(MEMORY_DELETE_ITEM_CHANNEL, (_event, itemId) =>
     projectSession.deleteKnowledgeItem(itemId),
+  );
+  ipcMain.handle(MEMORY_EXPIRE_ITEM_CHANNEL, (_event, itemId) =>
+    projectSession.expireKnowledgeItem(itemId),
   );
 }
 
